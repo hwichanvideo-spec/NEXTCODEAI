@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXTCODE AI - 차세대 AI 어시스턴트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1000px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .title-section h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .title-section p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            background: #f8fafc;
+        }
+
+        .chat-area::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-area::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .chat-area::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .avatar.ai {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .avatar.user {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.6;
+        }
+
+        .message.ai .message-content {
+            background: white;
+            color: #1e293b;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .typing-indicator {
+            display: none;
+            gap: 4px;
+            padding: 15px 20px;
+        }
+
+        .typing-indicator.active {
+            display: flex;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .input-area {
+            padding: 20px 30px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #userInput:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        #sendButton {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #sendButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        #sendButton:active {
+            transform: translateY(0);
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+
+        .welcome-message h2 {
+            font-size: 28px;
+            color: #1e293b;
+            margin-bottom: 15px;
+        }
+
+        .suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .suggestion-chip {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .suggestion-chip:hover {
+            border-color: #667eea;
+            background: #f1f5f9;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .title-section h1 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <div class="logo">NC</div>
+                <div class="title-section">
+                    <h1>NEXTCODE AI</h1>
+                    <p>차세대 AI 어시스턴트</p>
+                </div>
+            </div>
+            <div class="status">
+                <div class="status-dot"></div>
+                <span>온라인</span>
+            </div>
+        </div>
+
+        <div class="chat-area" id="chatArea">
+            <div class="welcome-message">
+                <h2>👋 안녕하세요!</h2>
+                <p>저는 NEXTCODE AI입니다. 무엇을 도와드릴까요?</p>
+                <div class="suggestions">
+                    <div class="suggestion-chip" onclick="sendSuggestion('코딩 도움이 필요해요')">💻 코딩 도움</div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('프로그래밍 언어 추천해줘')">🚀 언어 추천</div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('웹 개발 배우고 싶어요')">🌐 웹 개발</div>
+                    <div class="suggestion-chip" onclick="sendSuggestion('AI에 대해 알려줘')">🤖 AI 정보</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-container">
+                <input 
+                    type="text" 
+                    id="userInput" 
+                    placeholder="메시지를 입력하세요..." 
+                    onkeypress="handleKeyPress(event)"
+                >
+                <button id="sendButton" onclick="sendMessage()">전송</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const userInput = document.getElementById('userInput');
+
+        const responses = {
+            greetings: [
+                "안녕하세요! 저는 NEXTCODE AI입니다. 프로그래밍과 기술에 관한 질문이 있으시면 언제든 물어보세요! 😊",
+                "반갑습니다! 코딩과 개발에 대해 무엇이든 물어보세요. 최선을 다해 도와드리겠습니다!",
+                "안녕하세요! NEXTCODE AI입니다. 어떤 프로젝트를 진행 중이신가요?"
+            ],
+            coding: [
+                "코딩은 창의성과 논리의 결합입니다! 어떤 언어나 프로젝트에 관심이 있으신가요? Python, JavaScript, Java 등 다양한 언어를 도와드릴 수 있습니다.",
+                "프로그래밍 학습은 꾸준한 연습이 핵심입니다. 작은 프로젝트부터 시작해서 점진적으로 복잡한 것들을 만들어보세요!",
+                "코딩 문제가 있으신가요? 구체적인 에러나 코드를 공유해주시면 함께 해결해드릴게요!"
+            ],
+            ai: [
+                "AI는 현재 가장 혁신적인 기술 분야 중 하나입니다! 머신러닝, 딥러닝, 자연어 처리 등 다양한 분야가 있어요. 어떤 부분이 궁금하신가요?",
+                "인공지능은 데이터와 알고리즘을 통해 학습하고 발전합니다. Python의 TensorFlow나 PyTorch로 시작해보시는 것을 추천드립니다!",
+                "저도 AI 기술을 기반으로 작동하고 있답니다! AI에 대해 더 자세히 알고 싶으신 부분이 있나요?"
+            ],
+            web: [
+                "웹 개발을 시작하시려면 HTML, CSS, JavaScript부터 배우시는 것을 추천드립니다! 그 다음 React나 Vue 같은 프레임워크를 학습하면 좋습니다.",
+                "프론트엔드와 백엔드 중 어떤 분야에 관심이 있으신가요? 각각 배울 것들이 조금씩 다릅니다!",
+                "웹 개발은 매우 역동적인 분야입니다. 실제 프로젝트를 만들어보면서 배우는 것이 가장 효과적이에요!"
+            ],
+            help: [
+                "저는 다음과 같은 도움을 드릴 수 있습니다:\n\n• 프로그래밍 언어 학습 가이드\n• 코딩 문제 해결\n• 프로젝트 아이디어 제안\n• 기술 스택 추천\n• 알고리즘 설명\n\n무엇이 필요하신가요?",
+                "NEXTCODE AI는 여러분의 코딩 여정을 함께합니다! 질문하시면 최선을 다해 답변드리겠습니다."
+            ],
+            thanks: [
+                "천만에요! 더 궁금한 것이 있으면 언제든 물어보세요! 😊",
+                "도움이 되었다니 기쁩니다! 다른 질문이 있으시면 말씀해주세요.",
+                "별말씀을요! 함께 문제를 해결하는 것이 저의 역할이에요!"
+            ],
+            default: [
+                "흥미로운 질문이네요! 더 구체적으로 말씀해주시면 더 자세히 답변드릴 수 있습니다.",
+                "그것에 대해 더 알려주실 수 있나요? 어떤 부분이 가장 궁금하신가요?",
+                "좋은 질문입니다! 제가 이해한 것이 맞는지 확인하고 싶은데, 조금 더 설명해주실 수 있을까요?",
+                "저는 NEXTCODE AI로서 프로그래밍과 기술 관련 질문에 특화되어 있습니다. 코딩이나 개발 관련 질문이 있으시면 도와드리겠습니다!"
+            ]
+        };
+
+        function addMessage(text, isUser) {
+            const welcomeMsg = chatArea.querySelector('.welcome-message');
+            if (welcomeMsg) welcomeMsg.remove();
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = `avatar ${isUser ? 'user' : 'ai'}`;
+            avatar.textContent = isUser ? 'U' : 'NC';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = text;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            chatArea.appendChild(messageDiv);
+            
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai';
+            typingDiv.id = 'typing';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar ai';
+            avatar.textContent = 'NC';
+            
+            const indicator = document.createElement('div');
+            indicator.className = 'typing-indicator active';
+            indicator.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            
+            typingDiv.appendChild(avatar);
+            typingDiv.appendChild(indicator);
+            chatArea.appendChild(typingDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typing = document.getElementById('typing');
+            if (typing) typing.remove();
+        }
+
+        function getResponse(message) {
+            const lower = message.toLowerCase();
+            
+            if (lower.match(/안녕|하이|hello|hi|헬로/)) {
+                return responses.greetings[Math.floor(Math.random() * responses.greetings.length)];
+            }
+            if (lower.match(/코딩|프로그래밍|개발|코드/)) {
+                return responses.coding[Math.floor(Math.random() * responses.coding.length)];
+            }
+            if (lower.match(/ai|인공지능|머신러닝|딥러닝/)) {
+                return responses.ai[Math.floor(Math.random() * responses.ai.length)];
+            }
+            if (lower.match(/웹|html|css|javascript|react|vue/)) {
+                return responses.web[Math.floor(Math.random() * responses.web.length)];
+            }
+            if (lower.match(/도움|help|기능|할수있/)) {
+                return responses.help[Math.floor(Math.random() * responses.help.length)];
+            }
+            if (lower.match(/고마|감사|thanks/)) {
+                return responses.thanks[Math.floor(Math.random() * responses.thanks.length)];
+            }
+            
+            return responses.default[Math.floor(Math.random() * responses.default.length)];
+        }
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, true);
+            userInput.value = '';
+            
+            showTyping();
+            
+            setTimeout(() => {
+                hideTyping();
+                const response = getResponse(message);
+                addMessage(response, false);
+            }, 1000 + Math.random() * 1000);
+        }
+
+        function sendSuggestion(text) {
+            userInput.value = text;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        userInput.focus();
+    </script>
+</body>
+</html>
